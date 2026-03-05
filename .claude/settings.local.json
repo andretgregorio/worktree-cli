@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go version:*)",
+      "Bash(git worktree:*)",
+      "Bash(go:*)",
+      "Bash(mkdir:*)",
+      "Bash(./wt-bin create:*)",
+      "Bash(echo:*)",
+      "Bash(zsh:*)",
+      "Bash(go build:*)",
+      "Bash(chmod +x:*)",
+      "Bash(./wt-bin:*)"
+    ]
+  }
+}
