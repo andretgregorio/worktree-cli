@@ -100,15 +100,20 @@ func List(repoPath string) ([]WorktreeEntry, error) {
 	return entries, nil
 }
 
-func Remove(repoPath, worktreePath string) error {
-	if err := runGit(repoPath, "worktree", "remove", worktreePath); err != nil {
+func Remove(repoPath, worktreePath string, force bool) error {
+	args := []string{"worktree", "remove"}
+	if force {
+		args = append(args, "--force")
+	}
+	args = append(args, worktreePath)
+	if err := runGit(repoPath, args...); err != nil {
 		return fmt.Errorf("git worktree remove failed: %w", err)
 	}
 	return nil
 }
 
-func RemoveWithBranch(repoPath, worktreePath, branch string) error {
-	if err := Remove(repoPath, worktreePath); err != nil {
+func RemoveWithBranch(repoPath, worktreePath, branch string, force bool) error {
+	if err := Remove(repoPath, worktreePath, force); err != nil {
 		return err
 	}
 

@@ -355,7 +355,7 @@ func TestIntegration_Remove(t *testing.T) {
 		t.Fatal("worktree not created")
 	}
 
-	err := Remove(cloneDir, wtDir)
+	err := Remove(cloneDir, wtDir, false)
 	if err != nil {
 		t.Fatalf("Remove() error: %v", err)
 	}
@@ -385,7 +385,7 @@ func TestIntegration_RemoveWithBranch(t *testing.T) {
 
 	Create(CreateOptions{RepoName: "test", BranchName: "feat/remove-branch", Config: cfg})
 
-	err := RemoveWithBranch(cloneDir, wtDir, "feat/remove-branch")
+	err := RemoveWithBranch(cloneDir, wtDir, "feat/remove-branch", false)
 	if err != nil {
 		t.Fatalf("RemoveWithBranch() error: %v", err)
 	}

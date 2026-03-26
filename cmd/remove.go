@@ -21,11 +21,13 @@ var removeCmd = &cobra.Command{
 }
 
 func init() {
+	removeCmd.Flags().BoolP("force", "f", false, "Force removal even if worktree is dirty")
 	rootCmd.AddCommand(removeCmd)
 }
 
 func runRemove(cmd *cobra.Command, args []string) error {
 	repoName := args[0]
+	force, _ := cmd.Flags().GetBool("force")
 
 	cfg, err := config.LoadRepoConfig(repoName)
 	if err != nil {
@@ -33,13 +35,13 @@ func runRemove(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(args) == 2 {
-		return removeByName(cfg, repoName, args[1])
+		return removeByName(cfg, repoName, args[1], force)
 	}
 
-	return removeInteractive(cfg, repoName, os.Stdin, os.Stderr)
+	return removeInteractive(cfg, repoName, os.Stdin, os.Stderr, force)
 }
 
-func removeByName(cfg *config.RepoConfig, repoName, wtName string) error {
+func removeByName(cfg *config.RepoConfig, repoName, wtName string, force bool) error {
 	entries, err := worktree.List(cfg.RepoPath)
 	if err != nil {
 		return err
@@ -49,14 +51,14 @@ func removeByName(cfg *config.RepoConfig, repoName, wtName string) error {
 		dirName := dirBaseName(e.Path)
 		if dirName == wtName || e.Branch == wtName {
 			fmt.Fprintf(os.Stderr, "Removing worktree %s...\n", e.Path)
-			return worktree.RemoveWithBranch(cfg.RepoPath, e.Path, e.Branch)
+			return worktree.RemoveWithBranch(cfg.RepoPath, e.Path, e.Branch, force)
 		}
 	}
 
 	return fmt.Errorf("worktree %q not found for repo %q", wtName, repoName)
 }
 
-func removeInteractive(cfg *config.RepoConfig, repoName string, input io.Reader, output io.Writer) error {
+func removeInteractive(cfg *config.RepoConfig, repoName string, input io.Reader, output io.Writer, force bool) error {
 	entries, err := worktree.List(cfg.RepoPath)
 	if err != nil {
 		return err
@@ -85,7 +87,7 @@ func removeInteractive(cfg *config.RepoConfig, repoName string, input io.Reader,
 
 	selected := entries[choice-1]
 	fmt.Fprintf(output, "Removing worktree %s...\n", selected.Path)
-	return worktree.RemoveWithBranch(cfg.RepoPath, selected.Path, selected.Branch)
+	return worktree.RemoveWithBranch(cfg.RepoPath, selected.Path, selected.Branch, force)
 }
 
 func dirBaseName(path string) string {
